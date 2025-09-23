@@ -1,0 +1,12 @@
+@startuml context
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(user, "Пользователь", "Клиент компании, который использует умные устройства")
+Person(specialist, "Специалист", "Администрирует подключение и вывод датчиков/устройств")
+System_Boundary(c1, "Тёплый дом") {
+    System(warmhouse, "Система умного дома")
+}
+
+System(externalapi, "Система получения информации с датчиков")
+System(датчик, "Датчик")
+@enduml 
