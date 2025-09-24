@@ -53,8 +53,10 @@
 
 ### 4. Визуализация контекста системы — диаграмма С4
 
-[Схема](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/context/context.plantuml)
-![Image схема](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/context/context.png)
+[Диаграмма контекста](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/context/context.plantuml)
+
+
+![Image Диаграмма контекста](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/context/context.png)
 
 # Задание 2. Проектирование микросервисной архитектуры
 
