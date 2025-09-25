@@ -60,11 +60,12 @@
 
 # Задание 2. Проектирование микросервисной архитектуры
 
-В этом задании вам нужно предоставить только диаграммы в модели C4. Мы не просим вас отдельно описывать получившиеся микросервисы и то, как вы определили взаимодействия между компонентами To-Be системы. Если вы правильно подготовите диаграммы C4, они и так это покажут.
-
 **Диаграмма контейнеров (Containers)**
 
-Добавьте диаграмму.
+[Диаграмма контейнеров](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/containers/containers.plantuml)
+
+
+![Image Диаграмма контейнеров](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/containers/containers.png)
 
 **Диаграмма компонентов (Components)**
 
