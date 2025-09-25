@@ -69,17 +69,24 @@
 
 **Диаграмма компонентов (Components)**
 
-1. Сервис телеметрии
+1. Сервис телеметрии (TelemetryService)
 [Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/telemetry_service/components_telemetryservice.plantuml)
 
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/telemetry_service/components_telemetryservice.png)
 
-2. Сервис управления устройствами
+2. Сервис управления устройствами (DeviceService)
 [Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/device_service/components_deviceservice.plantuml)
 
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/device_service/components_deviceservice.png)
+
+3. Сервис управления пользователями (UserService)
+[Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/user_service/components_userservice.plantuml)
+
+
+![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/user_service/components_userservice.png)
+
 
 **Диаграмма кода (Code)**
 

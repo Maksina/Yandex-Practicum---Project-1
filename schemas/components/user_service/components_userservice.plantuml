@@ -1,0 +1,20 @@
+@startuml components
+
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
+
+Container_Boundary(userService, "Telemetry Service"){
+    Component(controller, "RestController", "Spring REST Controller", "API endpoint для управления пользователями")
+    Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
+    Component(repository, "Repository", "Spring Data JPA", "Взаимодействия с БД")
+}
+
+ContainerDb_Ext(userdb, "User Service DB", "PostgreSQL", "Хранение данных пользователя")
+
+Rel(apigw, controller, "Вызов API (Маршрутизация запросов пользователя)", "HTTP")
+Rel(controller, service, "Использует")
+Rel(service, repository, "Использует")
+Rel(repository, userdb, "Чтение/запись", "JDBC")
+
+@enduml 
