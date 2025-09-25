@@ -7,7 +7,8 @@ Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизаци�
 Container_Boundary(telemetryservice, "Telemetry Service"){
     Component(controller, "RestController", "Spring REST Controller", "API endpoint для передачи данных телеметрии")
     Component(handler, "EventHandler", "Kafka Consumer", "Обработка событий телеметрии")
-    Component(dbwriter, "InfluxDBWriter", "Spring Bean", "description")
+    Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
+    Component(dbwriter, "InfluxDBWriter", "Spring Bean", "Взаимодействия с БД")
 }
 
 ContainerDb_Ext(telemetrydb, "Telemetry DB", "InfluxDB", "Хранение телеметрии с IoT-устройств")
@@ -15,8 +16,9 @@ Container_Ext(kafka, "Kafka", "Kafka", "Шина событий")
 
 Rel(apigw, controller, "Вызов API (Маршрутизация запросов пользователя)", "HTTP")
 Rel(kafka, handler, "Доставка телеметрии", "Consumer")
-Rel(controller, dbwriter, "")
-Rel(handler, dbwriter, "")
+Rel(controller, service, "Использует")
+Rel(handler, service, "Использует")
+Rel(service, dbwriter, "Использует")
 Rel(dbwriter, telemetrydb, "Чтение/запись", "HTTP / InfluxDB Line Protocol")
 
 @enduml 
