@@ -57,6 +57,6 @@ DeviceService ..> DeviceRepository : вызывает
 DeviceService ..> CommandProducer : вызывает
 DeviceStatusConsumer ..> DeviceService : вызывает
 DeviceService ..> Device : управляет
-DeviceRepository ..> Device : сохраняет/загружает
+DeviceRepository ..> Device : читает/изменяет
 
 @enduml
