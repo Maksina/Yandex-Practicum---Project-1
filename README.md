@@ -107,7 +107,11 @@
 
 **Диаграмма кода (Code)**
 
-Добавьте одну диаграмму или несколько.
+*DeviceService*
+[Диаграмма кода](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/code/device_service/code_deviceservice.plantuml)
+
+
+![Image Диаграмма кода](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/code/device_service/code_deviceservice.png)
 
 # Задание 3. Разработка ER-диаграммы
 
