@@ -93,6 +93,12 @@
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/automation_service/components_automationservice.png)
 
+5. Адаптер HTTP (HTTPAdapter)
+[Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/http_adapter/components_httpadapter.plantuml)
+
+
+![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/http_adapter/components_httpadapter.png)
+
 
 **Диаграмма кода (Code)**
 
