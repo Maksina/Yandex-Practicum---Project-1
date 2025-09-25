@@ -1,0 +1,28 @@
+@startuml components
+
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
+Container_Ext(deviceservice, "Device Service", "Java Spring", "Управление IoT-устройства")
+
+Container_Boundary(automationService, "AutomationService"){
+    Component(controller, "RestController", "Spring REST Controller", "API endpoint для управления автоматизациями")
+    Component(consumerHandler, "EventHandler", "Kafka Consumer", "Обработка событий телеметрии")
+    Component(apiClient, "Client", "RestTemplate", "Отправка команды на устройство")
+    Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
+    Component(repository, "Repository", "Spring Data JPA", "Взаимодействия с БД")
+}
+
+ContainerDb_Ext(automationdb, "Automation DB", "PostgreSQL", "Хранение информации об автоматизациях и сценариях работы")
+Container_Ext(kafka, "Kafka", "Kafka", "Шина событий")
+
+Rel(apigw, controller, "Вызов API (Маршрутизация запросов пользователя)", "HTTP")
+Rel(controller, service, "Использует")
+Rel(service, repository, "Использует")
+Rel(repository, automationdb, "Чтение/запись", "JDBC")
+Rel(consumerHandler, service, "Использует")
+Rel(kafka, consumerHandler, "Доставка телеметрии", "Consumer")
+Rel(service, apiClient, "Использует")
+Rel(apiClient, deviceservice, "Вызов API", "HTTP")
+
+@enduml 

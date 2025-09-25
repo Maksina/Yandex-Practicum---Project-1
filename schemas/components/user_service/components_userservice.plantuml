@@ -4,7 +4,7 @@
 
 Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
 
-Container_Boundary(userService, "Telemetry Service"){
+Container_Boundary(userService, "UserService"){
     Component(controller, "RestController", "Spring REST Controller", "API endpoint для управления пользователями")
     Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
     Component(repository, "Repository", "Spring Data JPA", "Взаимодействия с БД")

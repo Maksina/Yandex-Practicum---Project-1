@@ -87,6 +87,12 @@
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/user_service/components_userservice.png)
 
+4. Сервис управления автоматизациями (AutomationService)
+[Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/automation_service/components_automationservice.plantuml)
+
+
+![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/automation_service/components_automationservice.png)
+
 
 **Диаграмма кода (Code)**
 

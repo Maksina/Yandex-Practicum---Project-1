@@ -4,7 +4,7 @@
 
 Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
 
-Container_Boundary(telemetryservice, "Telemetry Service"){
+Container_Boundary(telemetryservice, "TelemetryService"){
     Component(controller, "RestController", "Spring REST Controller", "API endpoint для передачи данных телеметрии")
     Component(handler, "EventHandler", "Kafka Consumer", "Обработка событий телеметрии")
     Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
