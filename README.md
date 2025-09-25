@@ -99,6 +99,11 @@
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/http_adapter/components_httpadapter.png)
 
+6. Адаптер MQTT (MQTTAdapter)
+[Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/mqtt_adapter/components_mqttadapter.plantuml)
+
+
+![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/mqtt_adapter/components_mqttadapter.png)
 
 **Диаграмма кода (Code)**
 
