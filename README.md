@@ -115,7 +115,12 @@
 
 # Задание 3. Разработка ER-диаграммы
 
-Добавьте сюда ER-диаграмму. Она должна отражать ключевые сущности системы, их атрибуты и тип связей между ними.
+Примечание: TimeSeriesDB (InfluxDB), которая используется для хранения телеметрии, отображена на схеме как "note", т.к. не является реляционной и не укладывается в описываемый формат ERD.
+
+[ER-диаграмма](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/erd/erd.plantuml)
+
+
+![Image ER-диаграмма](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/erd/erd.png)
 
 # Задание 4. Создание и документирование API
 

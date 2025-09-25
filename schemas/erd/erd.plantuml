@@ -1,0 +1,117 @@
+@startuml erd
+
+entity devices {
+    * device_id: number <<generated>>
+    --
+    name: varchar
+    location_id: number <<FK>>
+    device_type_id: number <<FK>>
+    is_active: boolean
+    serial_number: varchar <<unique>>
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity device_types {
+    * device_type_id: number <<generated>>
+    --
+    name
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity device_type_commands {
+    * device_type_command_id: number <<generated>>
+    --
+    device_type_id: number <<FK>>
+    name: varchar
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity device_type_telemetries {
+    * device_type_telemetry_id: number <<generated>>
+    --
+    device_type_id: number <<FK>>
+    telemetry_type: varchar
+    name: varchar
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity users {
+    * user_id: number <<generated>>
+    --
+    first_name: varchar
+    last_name: varchar
+    email: varchar <<unique>>
+    phone: varchar <<unique>>
+    password_hash: varchar
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity locations {
+    * location_id: number <<generated>>
+    --
+    name
+    user_id: number <<FK>>
+    parent_location_id: number <<FK>>
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity automation_rules {
+    * rule_id: number <<generated>>
+    --
+    user_id: number <<FK>>
+    name: varchar
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity automation_triggers {
+    * trigger_id: number <<generated>>
+    --
+    rule_id: number <<FK>>
+    device_id: number <<FK>>
+    device_type_telemetry_id: number <<FK>>
+    operator: varchar
+    value: varchar
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+entity automation_actions {
+    * action_id: number <<generated>>
+    --
+    rule_id: number <<FK>>
+    device_id: number <<FK>>
+    device_type_command_id: number <<FK>>
+    created_at: timestamp
+    updated_at: timestamp
+}
+
+note left of devices
+  <b>InfluxDB: Хранение телеметрии. Привязана к device_id</b>
+  Measurement storing telemetry:
+  - Tags: device_id
+  - Fields: temperature, humidity, pressure
+  - Timestamp: time of reading
+end note
+
+'Подумано
+locations ||--o{ devices : "1:N"
+users ||--o{ locations : "1:N"
+locations }o--|| locations : "parent 1\nchild 0..N"
+device_types ||--o{ devices : "1:N"
+device_types ||--o{ device_type_commands : "1:N"
+device_types ||--o{ device_type_telemetries : "1:N"
+automation_rules ||--o{ automation_triggers : "1:N"
+automation_rules ||--o{ automation_actions : "1:N"
+devices ||--o{ automation_triggers : "1:N"
+devices ||--o{ automation_actions : "1:N"
+users ||--o{ automation_rules : "1:N"
+device_type_commands ||--o{ automation_actions : "1:N"
+device_type_telemetries ||--o{ automation_triggers : "1:N"
+@enduml
