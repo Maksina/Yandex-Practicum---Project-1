@@ -1,0 +1,225 @@
+openapi: 3.0.3
+info:
+  title: LocationService API
+  description: API для управления иерархической структурой помещений (дом, комната и т.д.).
+  version: 1.0.0
+servers:
+  - url: https://localhost:8086/api/v1
+    description: Основной сервер LocationService
+
+tags:
+  - name: Управление локациями
+    description: Создание, чтение, обновление и удаление локаций с поддержкой иерархии.
+
+paths:
+  /locations:
+    get:
+      tags: [Управление локациями]
+      summary: Получить дерево локаций пользователя
+      operationId: getLocationTree
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Идентификатор пользователя
+      responses:
+        '200':
+          description: Дерево локаций успешно получено
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationWithChildren'
+                description: Массив корневых локаций (у которых parent_location_id = null)
+        '400':
+          description: Параметр user_id не указан
+        '500':
+          description: Внутренняя ошибка сервера
+
+    post:
+      tags: [Управление локациями]
+      summary: Создать новую локацию
+      operationId: createLocation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationCreate'
+      responses:
+        '201':
+          description: Локация успешно создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '400':
+          description: Некорректные данные (например, цикл в иерархии или parent_location_id не принадлежит user_id)
+        '404':
+          description: Родительская локация не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /locations/{location_id}:
+    get:
+      tags: [Управление локациями]
+      summary: Получить локацию по ID
+      operationId: getLocationById
+      parameters:
+        - name: location_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Локация успешно найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationWithChildren'
+        '404':
+          description: Локация не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Управление локациями]
+      summary: Обновить локацию (название или родителя)
+      operationId: updateLocation
+      parameters:
+        - name: location_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationUpdate'
+      responses:
+        '200':
+          description: Локация успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '400':
+          description: Некорректные данные (например, цикл при смене родителя)
+        '404':
+          description: Локация или новый родитель не найдены
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Управление локациями]
+      summary: Удалить локацию и всё её поддерево
+      operationId: deleteLocation
+      parameters:
+        - name: location_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Локация и все вложенные локации успешно удалены
+        '404':
+          description: Локация не найдена
+        '409':
+          description: Невозможно удалить — существуют привязанные устройства (если такая проверка реализована)
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    Location:
+      type: object
+      required:
+        - location_id
+        - name
+        - user_id
+        - created_at
+        - updated_at
+      properties:
+        location_id:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          example: "Гостиная"
+        user_id:
+          type: integer
+          format: int64
+          readOnly: true
+        parent_location_id:
+          type: integer
+          format: int64
+          nullable: true
+          example: 1
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    LocationWithChildren:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/Location'
+        - type: object
+          properties:
+            children:
+              type: array
+              items:
+                $ref: '#/components/schemas/LocationWithChildren'
+              description: Рекурсивный список дочерних локаций
+
+    LocationCreate:
+      type: object
+      required:
+        - user_id
+        - name
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          example: 101
+        name:
+          type: string
+          example: "Спальня"
+        parent_location_id:
+          type: integer
+          format: int64
+          nullable: true
+          description: Если не указано — локация будет корневой (например, "Дом")
+          example: 5
+
+    LocationUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "Новая гостиная"
+        parent_location_id:
+          type: integer
+          format: int64
+          nullable: true
+          description: |
+            Новый родитель. 
+            Передача null сделает локацию корневой.
+            Сервис проверит, что не создаётся цикл.
+          example: 10

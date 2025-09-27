@@ -93,13 +93,19 @@
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/automation_service/components_automationservice.png)
 
-5. Адаптер HTTP (HTTPAdapter)
+5. Сервис управления помещениями (LocationService)
+[Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/location_service/components_locationservice.plantuml)
+
+
+![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/location_service/components_locationservice.png)
+
+6. Адаптер HTTP (HTTPAdapter)
 [Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/http_adapter/components_httpadapter.plantuml)
 
 
 ![Image Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/http_adapter/components_httpadapter.png)
 
-6. Адаптер MQTT (MQTTAdapter)
+7. Адаптер MQTT (MQTTAdapter)
 [Диаграмма компонентов](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/schemas/components/mqtt_adapter/components_mqttadapter.plantuml)
 
 
@@ -130,7 +136,16 @@
 
 ### 2. Документация API
 
-Здесь приложите ссылки на документацию API для микросервисов, которые вы спроектировали в первой части проектной работы. Для документирования используйте Swagger/OpenAPI или AsyncAPI.
+1. *AutomationService*
+[openapi](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/api/automation_service.yaml)
+2. *DeviceService*
+[openapi](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/api/device_service.yaml)
+3. *LocationService*
+[openapi](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/api/location_service.yaml)
+4. *TelemetryService*
+[openapi](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/api/telemetry_service.yaml)
+5. *UserService*
+[openapi](https://github.com/Maksina/Yandex-Practicum---Project-1/blob/warmhouse/api/user_service.yaml)
 
 # Задание 5. Работа с docker и docker-compose
 
