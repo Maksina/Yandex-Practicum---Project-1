@@ -37,6 +37,46 @@ services:
     networks:
       - smarthome-network
 
+  postgres-location:
+    image: postgres:16-alpine
+    container_name: location-service-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_location_data:/var/lib/postgresql/data
+      - ./LocationService/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres && psql -U postgres -d location_db -c 'SELECT 1 FROM locations'"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - smarthome-network
+
+  influxdb:
+    image: influxdb:2.7
+    container_name: influxdb
+    ports:
+      - "8086:8086"
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=password
+      - DOCKER_INFLUXDB_INIT_ORG=smarthome
+      - DOCKER_INFLUXDB_INIT_BUCKET=telemetry-bucket
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=a1b2c3d4e5f6789012345678901234567890abcd12345678901234567890abcd
+    volumes:
+      - influxdb_data:/var/lib/influxdb2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - smarthome-network
+
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
     container_name: zookeeper
@@ -123,10 +163,8 @@ services:
       dockerfile: Dockerfile
     container_name: device-service-app
     depends_on:
-      postgres:
+      postgres-device:
         condition: service_healthy
-      temperature-api:
-        condition: service_started
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-device:5432/device_db
       SPRING_DATASOURCE_USERNAME: postgres
@@ -137,9 +175,49 @@ services:
     networks:
       - smarthome-network
 
+  location-service:
+    build:
+      context: ./LocationService
+      dockerfile: Dockerfile
+    container_name: location-service-app
+    depends_on:
+      postgres-location:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-location:5432/location_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+    ports:
+      - "8092:8092"
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
+  telemetry-service:
+    build:
+      context: ./TelemetryService
+      dockerfile: Dockerfile
+    container_name: telemetry-service
+    depends_on:
+      influxdb:
+        condition: service_healthy
+    environment:
+      - SERVER_PORT=8091
+      - INFLUXDB_URL=http://influxdb:8086
+      - INFLUXDB_TOKEN=a1b2c3d4e5f6789012345678901234567890abcd12345678901234567890abcd
+      - INFLUXDB_ORG=smarthome
+      - INFLUXDB_BUCKET=telemetry-bucket
+    ports:
+      - "8091:8091"
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
 volumes:
   postgres_data:
   postgres_device_data: 
+  postgres_location_data: 
+  influxdb_data:
 
 networks:
   smarthome-network:
