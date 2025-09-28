@@ -1,0 +1,808 @@
+openapi: 3.0.3
+info:
+  title: DeviceService API
+  description: API для управления IoT-устройствами, типами устройств, командами и телеметрией.
+  version: 1.0.0
+servers:
+  - url: https://localhost:8090/api/v1
+    description: Основной сервер DeviceService
+
+tags:
+  - name: Устройства
+    description: Управление IoT-устройствами умного дома.
+  - name: Типы устройств
+    description: Управление справочником типов устройств.
+  - name: Команды типов устройств
+    description: Управление списком команд, поддерживаемых каждым типом устройства.
+  - name: Телеметрия типов устройств
+    description: Управление списком типов телеметрии, поддерживаемых каждым типом устройства.
+
+paths:
+  # === Устройства ===
+  /devices:
+    get:
+      tags: [Устройства]
+      summary: Получить список всех устройств для locationId
+      operationId: getDevices
+      parameters:
+        - name: locationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Идентификатор пользователя, чьи правила необходимо получить
+      responses:
+        '200':
+          description: Список устройств успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '500':
+          description: Внутренняя ошибка сервера
+
+    post:
+      tags: [Устройства]
+      summary: Создать новое устройство
+      operationId: createDevice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreate'
+      responses:
+        '201':
+          description: Устройство успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Некорректные данные
+        '409':
+          description: Устройство с таким serialNumber уже существует
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /devices/{deviceId}:
+    get:
+      tags: [Устройства]
+      summary: Получить устройство по ID
+      operationId: getDeviceById
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Устройство успешно найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Устройство не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Устройства]
+      summary: Обновить устройство
+      description: Поддерживается обновление name и locationId.
+      operationId: updateDeviceName
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceNameUpdate'
+      responses:
+        '200':
+          description: Название устройства успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '400':
+          description: Некорректные данные запроса
+        '404':
+          description: Устройство не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Устройства]
+      summary: Удалить устройство по ID
+      operationId: deleteDevice
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Устройство успешно удалено
+        '404':
+          description: Устройство не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /devices/{deviceId}/commands:
+    post:
+      tags: [Устройства]
+      summary: Отправить команду устройству
+      operationId: sendCommandToDevice
+      parameters:
+        - name: deviceId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCommand'
+      responses:
+        '202':
+          description: Команда принята к отправке (асинхронная обработка)
+        '400':
+          description: Недопустимая команда или параметры
+        '404':
+          description: Устройство не найдено
+        '409':
+          description: Команда не поддерживается для типа этого устройства
+        '500':
+          description: Внутренняя ошибка сервера
+
+  # === Типы устройств ===
+  /device-types:
+    get:
+      tags: [Типы устройств]
+      summary: Получить список всех типов устройств
+      operationId: getDeviceTypes
+      responses:
+        '200':
+          description: Список типов устройств успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceType'
+        '500':
+          description: Внутренняя ошибка сервера
+
+    post:
+      tags: [Типы устройств]
+      summary: Создать новый тип устройства
+      operationId: createDeviceType
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTypeCreate'
+      responses:
+        '201':
+          description: Тип устройства успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceType'
+        '400':
+          description: Некорректные данные
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /device-types/{deviceTypeId}:
+    get:
+      tags: [Типы устройств]
+      summary: Получить тип устройства по ID
+      operationId: getDeviceTypeById
+      parameters:
+        - name: deviceTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Тип устройства успешно найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeWithDetails'
+        '404':
+          description: Тип устройства не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Типы устройств]
+      summary: Обновить название типа устройства
+      operationId: updateDeviceTypeName
+      parameters:
+        - name: deviceTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTypeNameUpdate'
+      responses:
+        '200':
+          description: Название типа устройства успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceType'
+        '400':
+          description: Некорректные данные запроса
+        '404':
+          description: Тип устройства не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Типы устройств]
+      summary: Удалить тип устройства по ID
+      operationId: deleteDeviceType
+      parameters:
+        - name: deviceTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Тип устройства успешно удалён
+        '404':
+          description: Тип устройства не найден
+        '409':
+          description: Невозможно удалить — существуют устройства этого типа
+        '500':
+          description: Внутренняя ошибка сервера
+
+  # === Команды типов устройств ===
+  /device-type-commands:
+    post:
+      tags: [Команды типов устройств]
+      summary: Добавить новую команду для типа устройства
+      operationId: addDeviceTypeCommand
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTypeCommandCreate'
+      responses:
+        '201':
+          description: Команда успешно добавлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeCommand'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Тип устройства не найден
+        '409':
+          description: Команда с таким именем уже существует для этого типа
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /device-type-commands/{deviceTypeCommandId}:
+    get:
+      tags: [Команды типов устройств]
+      summary: Получить конкретную команду по ID
+      operationId: getDeviceTypeCommand
+      parameters:
+        - name: deviceTypeCommandId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Команда успешно найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeCommand'
+        '404':
+          description: Команда не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Команды типов устройств]
+      summary: Обновить команду по ID
+      operationId: updateDeviceTypeCommand
+      parameters:
+        - name: deviceTypeCommandId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTypeCommandUpdate'
+      responses:
+        '200':
+          description: Команда успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeCommand'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Команда не найдена
+        '409':
+          description: Конфликт — команда с новым именем уже существует для этого типа
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Команды типов устройств]
+      summary: Удалить команду по ID
+      operationId: deleteDeviceTypeCommand
+      parameters:
+        - name: deviceTypeCommandId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Команда успешно удалена
+        '404':
+          description: Команда не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /device-types/{deviceTypeId}/commands:
+    get:
+      tags: [Команды типов устройств]
+      summary: Получить список команд для типа устройства
+      operationId: getDeviceTypeCommandsByType
+      parameters:
+        - name: deviceTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Список команд успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceTypeCommand'
+        '404':
+          description: Тип устройства не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+  # === Телеметрия типов устройств ===
+  /device-type-telemetries:
+    post:
+      tags: [Телеметрия типов устройств]
+      summary: Добавить новую телеметрию для типа устройства
+      operationId: addDeviceTypeTelemetry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTypeTelemetryCreate'
+      responses:
+        '201':
+          description: Телеметрия успешно добавлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeTelemetry'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Тип устройства не найден
+        '409':
+          description: Телеметрия с таким именем уже существует для этого типа
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /device-type-telemetries/{deviceTypeTelemetryId}:
+    get:
+      tags: [Телеметрия типов устройств]
+      summary: Получить телеметрию по ID
+      operationId: getDeviceTypeTelemetry
+      parameters:
+        - name: deviceTypeTelemetryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Телеметрия успешно найдена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeTelemetry'
+        '404':
+          description: Телеметрия не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Телеметрия типов устройств]
+      summary: Обновить телеметрию по ID
+      operationId: updateDeviceTypeTelemetry
+      parameters:
+        - name: deviceTypeTelemetryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceTypeTelemetryUpdate'
+      responses:
+        '200':
+          description: Телеметрия успешно обновлена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceTypeTelemetry'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Телеметрия не найдена
+        '409':
+          description: Конфликт — телеметрия с новым именем уже существует для этого типа
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Телеметрия типов устройств]
+      summary: Удалить телеметрию по ID
+      operationId: deleteDeviceTypeTelemetry
+      parameters:
+        - name: deviceTypeTelemetryId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Телеметрия успешно удалена
+        '404':
+          description: Телеметрия не найдена
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /device-types/{deviceTypeId}/telemetries:
+    get:
+      tags: [Телеметрия типов устройств]
+      summary: Получить список телеметрии для типа устройства
+      operationId: getDeviceTypeTelemetriesByType
+      parameters:
+        - name: deviceTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Список телеметрии успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeviceTypeTelemetry'
+        '404':
+          description: Тип устройства не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    Device:
+      type: object
+      required:
+        - deviceId
+        - name
+        - locationId
+        - deviceTypeId
+        - isActive
+        - serialNumber
+        - createdAt
+        - updatedAt
+      properties:
+        deviceId:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          example: "Гостиная лампа"
+        locationId:
+          type: integer
+          format: int64
+          example: 1
+        deviceTypeId:
+          type: integer
+          format: int64
+          example: 3
+        isActive:
+          type: boolean
+          example: true
+        serialNumber:
+          type: string
+          example: "SN-123456789"
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+    DeviceCreate:
+      type: object
+      required:
+        - name
+        - locationId
+        - deviceTypeId
+        - serialNumber
+      properties:
+        name:
+          type: string
+          example: "Кухонный датчик движения"
+        locationId:
+          type: integer
+          format: int64
+          example: 2
+        deviceTypeId:
+          type: integer
+          format: int64
+          example: 5
+        serialNumber:
+          type: string
+          example: "SN-987654321"
+
+    DeviceNameUpdate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Гостиная лампа"
+
+    DeviceCommand:
+      type: object
+      required:
+        - commandName
+      properties:
+        commandName:
+          type: string
+          example: "turn_on"
+
+    DeviceType:
+      type: object
+      required:
+        - deviceTypeId
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        deviceTypeId:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          example: "Умная лампа"
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+    DeviceTypeCreate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Умный замок"
+
+    DeviceTypeNameUpdate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Умная лампа"
+
+    DeviceTypeWithDetails:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/DeviceType'
+        - type: object
+          properties:
+            commands:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceTypeCommand'
+            telemetries:
+              type: array
+              items:
+                $ref: '#/components/schemas/DeviceTypeTelemetry'
+
+    DeviceTypeCommand:
+      type: object
+      required:
+        - deviceTypeCommandId
+        - deviceTypeId
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        deviceTypeCommandId:
+          type: integer
+          format: int64
+          readOnly: true
+        deviceTypeId:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          example: "turn_on"
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+    DeviceTypeCommandCreate:
+      type: object
+      required:
+        - deviceTypeId
+        - name
+      properties:
+        deviceTypeId:
+          type: integer
+          format: int64
+          example: 3
+        name:
+          type: string
+          example: "turn_on"
+
+    DeviceTypeCommandUpdate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "set_rgb_color"
+
+    DeviceTypeTelemetry:
+      type: object
+      required:
+        - deviceTypeTelemetryId
+        - deviceTypeId
+        - telemetry_type
+        - name
+        - createdAt
+        - updatedAt
+      properties:
+        deviceTypeTelemetryId:
+          type: integer
+          format: int64
+          readOnly: true
+        deviceTypeId:
+          type: integer
+          format: int64
+          readOnly: true
+        telemetry_type:
+          type: string
+          example: "temperature"
+        name:
+          type: string
+          example: "Температура"
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+
+    DeviceTypeTelemetryCreate:
+      type: object
+      required:
+        - deviceTypeId
+        - name
+        - telemetry_type
+      properties:
+        deviceTypeId:
+          type: integer
+          format: int64
+          example: 3
+        name:
+          type: string
+          example: "Температура"
+        telemetry_type:
+          type: string
+          example: "temperature"
+
+    DeviceTypeTelemetryUpdate:
+      type: object
+      required:
+        - name
+        - telemetry_type
+      properties:
+        name:
+          type: string
+          example: "Температура"
+        telemetry_type:
+          type: string
+          example: "temperature"

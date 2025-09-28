@@ -1,0 +1,221 @@
+openapi: 3.0.3
+info:
+  title: UserService API
+  description: API для управления пользователями и профилями.
+  version: 1.0.0
+servers:
+  - url: https://localhost:8082/api/v1
+    description: Основной сервер UserService
+
+paths:
+  /users:
+    get:
+      summary: Получить список всех пользователей
+      operationId: getUsers
+      responses:
+        '200':
+          description: Список пользователей успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '500':
+          description: Внутренняя ошибка сервера
+
+    post:
+      summary: Создать нового пользователя
+      operationId: createUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        '201':
+          description: Пользователь успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Некорректные данные запроса
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /users/{user_id}:
+    get:
+      summary: Получить информацию о пользователе по ID
+      operationId: getUserById
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Пользователь успешно найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      summary: Частично обновить данные пользователя
+      description: |
+        Обновляет только указанные поля. Неуказанные поля остаются без изменений.
+        Поддерживается обновление любого подмножества полей (включая пароль).
+      operationId: patchUser
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserPatch'
+      responses:
+        '200':
+          description: Пользователь успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Некорректные данные запроса
+        '404':
+          description: Пользователь не найден
+        '409':
+          description: Конфликт — email или phone уже используются другим пользователем
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      summary: Удалить пользователя по ID
+      operationId: deleteUser
+      parameters:
+        - name: user_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Пользователь успешно удалён
+        '404':
+          description: Пользователь не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - user_id
+        - first_name
+        - last_name
+        - email
+        - created_at
+        - updated_at
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          description: Уникальный идентификатор пользователя (генерируется автоматически)
+          readOnly: true
+        first_name:
+          type: string
+          example: "Иван"
+        last_name:
+          type: string
+          example: "Иванов"
+        email:
+          type: string
+          format: email
+          example: "ivan@yandex.ru"
+        phone:
+          type: string
+          nullable: true
+          example: "+79001234567"
+        password_hash:
+          type: string
+          description: Хэш пароля (никогда не возвращается в ответах)
+          readOnly: true
+          writeOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    UserCreate:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+      properties:
+        first_name:
+          type: string
+          example: "Иван"
+        last_name:
+          type: string
+          example: "Иванов"
+        email:
+          type: string
+          format: email
+          example: "ivan@yandex.ru"
+        phone:
+          type: string
+          nullable: true
+          example: "+79001234567"
+        password:
+          type: string
+          format: password
+          writeOnly: true
+          example: "SecurePass123!"
+
+    UserPatch:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: "Иван"
+        last_name:
+          type: string
+          example: "Иванов"
+        email:
+          type: string
+          format: email
+          example: "ivan@yandex.ru"
+        phone:
+          type: string
+          nullable: true
+          example: "+79001234567"
+        password:
+          type: string
+          format: password
+          writeOnly: true
+          example: "NewSecurePass456!"
+      description: |
+        Укажите только те поля, которые хотите обновить.
+        Пароль передаётся в открытом виде (по HTTPS), сервер хэширует его.

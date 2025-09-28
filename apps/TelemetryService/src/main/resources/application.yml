@@ -1,0 +1,8 @@
+server:
+  port: ${SERVER_PORT:8091}
+
+influxdb:
+  url: ${INFLUXDB_URL:http://localhost:8086}
+  token: ${INFLUXDB_TOKEN}
+  org: ${INFLUXDB_ORG}
+  bucket: ${INFLUXDB_BUCKET}

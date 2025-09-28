@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: TelemetryService API
+  description: API для получения телеметрии устройств умного дома из InfluxDB.
+  version: 1.0.0
+servers:
+  - url: https://localhost:8091/api/v1
+    description: Основной сервер TelemetryService
+
+tags:
+  - name: Телеметрия
+    description: Получение телеметрии с устройств (температура, влажность, давление).
+
+paths:
+  /telemetry:
+    get:
+      tags: [Телеметрия]
+      summary: Получить телеметрию по device_id с фильтрацией
+      operationId: getTelemetry
+      parameters:
+        - name: device_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Идентификатор устройства
+        - name: start
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Начало временного диапазона (включительно). По умолчанию — 1 час назад.
+          example: "2024-05-01T10:00:00Z"
+        - name: stop
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date-time
+          description: Конец временного диапазона (исключительно). По умолчанию — текущее время.
+          example: "2024-05-01T11:00:00Z"
+        - name: fields
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [temperature, humidity, pressure]
+            uniqueItems: true
+          style: form
+          explode: false
+          description: Список запрашиваемых метрик. По умолчанию — все.
+          example: ["temperature", "humidity"]
+        - name: agg
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [none, mean, max, min, count]
+          description: |
+            Тип агрегации. 
+            - `none` (по умолчанию): возвращаются сырые данные.
+            - `mean`, `max`, `min`, `count`: агрегация по интервалу (см. параметр `window`).
+          example: "mean"
+        - name: window
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: '^\d+(ms|s|m|h|d)$'
+          description: |
+            Размер окна агрегации (только если `agg` задан). 
+            Примеры: `1m` (1 минута), `10s`, `1h`.
+            По умолчанию — `1m`.
+          example: "5m"
+      responses:
+        '200':
+          description: Телеметрия успешно получена
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TelemetryPoint'
+        '400':
+          description: Некорректные параметры запроса (например, start > stop)
+        '404':
+          description: Устройство с указанным device_id не найдено
+        '500':
+          description: Внутренняя ошибка сервера (проблема с InfluxDB)
+
+components:
+  schemas:
+    TelemetryPoint:
+      type: object
+      required:
+        - time
+      properties:
+        time:
+          type: string
+          format: date-time
+          description: Время измерения в UTC
+          example: "2024-05-01T10:05:23Z"
+        temperature:
+          type: number
+          format: float
+          nullable: true
+          description: Температура в градусах Цельсия
+          example: 23.5
+        humidity:
+          type: number
+          format: float
+          nullable: true
+          description: Влажность в процентах
+          example: 45.2
+        pressure:
+          type: number
+          format: float
+          nullable: true
+          description: Атмосферное давление в гПа (гектопаскалях)
+          example: 1013.25
+      description: |
+        Точка телеметрии. 
+        Поля, не запрошенные через `fields`, будут отсутствовать или равны null.
+        При агрегации (`agg != none`) каждая точка представляет агрегированное значение за интервал.

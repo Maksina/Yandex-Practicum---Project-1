@@ -1,0 +1,581 @@
+openapi: 3.0.3
+info:
+  title: AutomationService API
+  description: API для управления сценариями автоматизации умного дома (правила, триггеры, действия).
+  version: 1.0.0
+servers:
+  - url: https://localhost:8084/api/v1
+    description: Основной сервер AutomationService
+
+tags:
+  - name: Управление правилами
+    description: Создание, чтение, обновление и удаление правил автоматизации. Правило создаётся атомарно со всеми триггерами и действиями.
+  - name: Управление триггерами
+    description: Добавление, обновление и удаление условий срабатывания правил (например, "температура > 25").
+  - name: Управление действиями
+    description: Добавление и удаление действий, выполняемых при срабатывании правила (например, "включить лампу").
+
+paths:
+  # === Управление правилами ===
+  /rules:
+    get:
+      tags: [Управление правилами]
+      summary: Получить список правил по user_id
+      operationId: getRules
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: Идентификатор пользователя, чьи правила необходимо получить
+      responses:
+        '200':
+          description: Список правил успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AutomationRule'
+        '400':
+          description: Параметр user_id не указан
+        '500':
+          description: Внутренняя ошибка сервера
+
+    post:
+      tags: [Управление правилами]
+      summary: Создать правило автоматизации со всеми триггерами и действиями
+      description: |
+        Правило должно содержать минимум один триггер и одно действие.
+        Весь запрос обрабатывается атомарно (в одной транзакции).
+        user_id берётся из тела запроса (вложено в правило).
+      operationId: createRuleWithTriggersAndActions
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationRuleCreateFull'
+      responses:
+        '201':
+          description: Правило успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationRuleWithDetails'
+        '400':
+          description: Отсутствуют триггеры или действия, либо некорректные данные
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /rules/{rule_id}:
+    get:
+      tags: [Управление правилами]
+      summary: Получить правило по ID со всеми триггерами и действиями
+      operationId: getRuleById
+      parameters:
+        - name: rule_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Правило успешно найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationRuleWithDetails'
+        '404':
+          description: Правило не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Управление правилами]
+      summary: Обновить название правила
+      operationId: updateRuleName
+      parameters:
+        - name: rule_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationRuleUpdate'
+      responses:
+        '200':
+          description: Правило успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationRule'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Правило не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Управление правилами]
+      summary: Удалить правило по ID (все триггеры и действия удаляются каскадно)
+      operationId: deleteRule
+      parameters:
+        - name: rule_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Правило успешно удалено
+        '404':
+          description: Правило не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+  # === Управление триггерами ===
+  /rules/{rule_id}/triggers:
+    post:
+      tags: [Управление триггерами]
+      summary: Добавить триггер к существующему правилу
+      operationId: addTriggerToRule
+      parameters:
+        - name: rule_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationTriggerCreate'
+      responses:
+        '201':
+          description: Триггер успешно добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationTrigger'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Правило не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /triggers/{trigger_id}:
+    get:
+      tags: [Управление триггерами]
+      summary: Получить триггер по ID
+      operationId: getTriggerById
+      parameters:
+        - name: trigger_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Триггер успешно найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationTrigger'
+        '404':
+          description: Триггер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    patch:
+      tags: [Управление триггерами]
+      summary: Обновить триггер по ID
+      operationId: updateTrigger
+      parameters:
+        - name: trigger_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationTriggerUpdate'
+      responses:
+        '200':
+          description: Триггер успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationTrigger'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Триггер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+    delete:
+      tags: [Управление триггерами]
+      summary: Удалить триггер по ID
+      operationId: deleteTrigger
+      parameters:
+        - name: trigger_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Триггер успешно удалён
+        '404':
+          description: Триггер не найден
+        '500':
+          description: Внутренняя ошибка сервера
+
+  # === Управление действиями ===
+  /rules/{rule_id}/actions:
+    post:
+      tags: [Управление действиями]
+      summary: Добавить действие к существующему правилу
+      operationId: addActionToRule
+      parameters:
+        - name: rule_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationActionCreate'
+      responses:
+        '201':
+          description: Действие успешно добавлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationAction'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Правило не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+  /actions/{action_id}:
+    get:
+      tags: [Управление действиями]
+      summary: Получить действие по ID
+      operationId: getActionById
+      parameters:
+        - name: action_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Действие успешно найдено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationAction'
+        '404':
+          description: Действие не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+    patch:
+      tags: [Управление действиями]
+      summary: Обновить дейcтвие по ID
+      operationId: updateAction
+      parameters:
+        - name: action_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationActionCreate'
+      responses:
+        '200':
+          description: Триггер успешно обновлён
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationAction'
+        '400':
+          description: Некорректные данные
+        '404':
+          description: Действие не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+          
+    delete:
+      tags: [Управление действиями]
+      summary: Удалить действие по ID
+      operationId: deleteAction
+      parameters:
+        - name: action_id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '204':
+          description: Действие успешно удалено
+        '404':
+          description: Действие не найдено
+        '500':
+          description: Внутренняя ошибка сервера
+
+components:
+  schemas:
+    AutomationRule:
+      type: object
+      required:
+        - rule_id
+        - user_id
+        - name
+        - created_at
+        - updated_at
+      properties:
+        rule_id:
+          type: integer
+          format: int64
+          readOnly: true
+        user_id:
+          type: integer
+          format: int64
+          readOnly: true
+        name:
+          type: string
+          example: "Включать свет при открытии двери"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    AutomationRuleUpdate:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: "Новое название правила"
+
+    AutomationRuleWithDetails:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/AutomationRule'
+        - type: object
+          properties:
+            triggers:
+              type: array
+              items:
+                $ref: '#/components/schemas/AutomationTrigger'
+            actions:
+              type: array
+              items:
+                $ref: '#/components/schemas/AutomationAction'
+
+    AutomationRuleCreateFull:
+      type: object
+      required:
+        - user_id
+        - name
+        - triggers
+        - actions
+      properties:
+        user_id:
+          type: integer
+          format: int64
+          example: 101
+        name:
+          type: string
+          example: "Поддерживать температуру 22°C"
+        triggers:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AutomationTriggerCreate'
+        actions:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/AutomationActionCreate'
+
+    AutomationTrigger:
+      type: object
+      required:
+        - trigger_id
+        - rule_id
+        - device_id
+        - device_type_telemetry_id
+        - operator
+        - value
+        - created_at
+        - updated_at
+      properties:
+        trigger_id:
+          type: integer
+          format: int64
+          readOnly: true
+        rule_id:
+          type: integer
+          format: int64
+          readOnly: true
+        device_id:
+          type: integer
+          format: int64
+          example: 5
+        device_type_telemetry_id:
+          type: integer
+          format: int64
+          example: 12
+        operator:
+          type: string
+          enum: [ "==", "!=", ">", ">=", "<", "<=", "contains", "in" ]
+          example: ">"
+        value:
+          type: string
+          example: "25.0"
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    AutomationTriggerCreate:
+      type: object
+      required:
+        - device_id
+        - device_type_telemetry_id
+        - operator
+        - value
+      properties:
+        device_id:
+          type: integer
+          format: int64
+          example: 5
+        device_type_telemetry_id:
+          type: integer
+          format: int64
+          example: 12
+        operator:
+          type: string
+          enum: [ "==", "!=", ">", ">=", "<", "<=", "contains", "in" ]
+          example: ">"
+        value:
+          type: string
+          example: "25.0"
+
+    AutomationTriggerUpdate:
+      type: object
+      required:
+        - device_id
+        - device_type_telemetry_id
+        - operator
+        - value
+      properties:
+        device_id:
+          type: integer
+          format: int64
+          example: 5
+        device_type_telemetry_id:
+          type: integer
+          format: int64
+          example: 12
+        operator:
+          type: string
+          enum: [ "==", "!=", ">", ">=", "<", "<=", "contains", "in" ]
+          example: ">="
+        value:
+          type: string
+          example: "24.5"
+
+    AutomationAction:
+      type: object
+      required:
+        - action_id
+        - rule_id
+        - device_id
+        - device_type_command_id
+        - created_at
+        - updated_at
+      properties:
+        action_id:
+          type: integer
+          format: int64
+          readOnly: true
+        rule_id:
+          type: integer
+          format: int64
+          readOnly: true
+        device_id:
+          type: integer
+          format: int64
+          example: 8
+        device_type_command_id:
+          type: integer
+          format: int64
+          example: 3
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+
+    AutomationActionCreate:
+      type: object
+      required:
+        - device_id
+        - device_type_command_id
+      properties:
+        device_id:
+          type: integer
+          format: int64
+          example: 8
+        device_type_command_id:
+          type: integer
+          format: int64
+          example: 3

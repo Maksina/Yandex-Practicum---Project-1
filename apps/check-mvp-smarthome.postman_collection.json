@@ -1,0 +1,77 @@
+{
+	"info": {
+		"_postman_id": "2ce91273-2278-4b33-87c4-16a938e4d8d6",
+		"name": "Check MVP smarthome",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44029480",
+		"_collection_link": "https://maksim-1067365.postman.co/workspace/Maksim's-Workspace~040ac691-8fee-4892-8c56-6e39fb079ba8/collection/44029480-2ce91273-2278-4b33-87c4-16a938e4d8d6?action=share&source=collection_link&creator=44029480"
+	},
+	"item": [
+		{
+			"name": "1. Создание устройства в монолите",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"Living Room Temperature\",\n    \"type\": \"temperature\",\n    \"location\": \"Living Room\",\n    \"unit\": \"°C\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/api/v1/sensors",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"api",
+						"v1",
+						"sensors"
+					]
+				},
+				"description": "Create a new sensor"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Проверка помещения в LocationService",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "3. Проверка устройства в DeviceService",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8090/api/v1/devices?locationId=1",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8090",
+					"path": [
+						"api",
+						"v1",
+						"devices"
+					],
+					"query": [
+						{
+							"key": "locationId",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

@@ -1,0 +1,29 @@
+@startuml components
+
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
+
+Container_Boundary(deviceService, "DeviceService"){
+    Component(controller, "RestController", "Spring REST Controller", "API endpoint для управления устройствами")
+    Component(consumerHandler, "EventHandler", "Kafka Consumer", "Обработка событий статуса")
+    Component(producer, "EventPublisher", "Kafka Producer", "Публикация команд")
+    Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
+    Component(repository, "Repository", "Spring Data JPA", "Взаимодействия с БД")
+}
+
+ContainerDb_Ext(devicedb, "Device DB", "PostgreSQL", "Хранение информации об IoT-устройствах")
+Container_Ext(automationService, "Automation Service", "Java Spring", "Управление автоматизациями IoT-устройств")
+Container_Ext(kafka, "Kafka", "Kafka", "Шина событий")
+
+Rel(automationService, controller, "Вызов API (Маршрутизация запросов пользователя)", "HTTP")
+Rel(apigw, controller, "Вызов API (Маршрутизация запросов пользователя)", "HTTP")
+Rel(kafka, consumerHandler, "Доставка статуса устройства", "Consumer")
+Rel(producer, kafka, "Публикация команды для устройства", "Producer")
+Rel(controller, service, "Использует")
+Rel(consumerHandler, service, "Использует")
+Rel(service, producer, "Использует")
+Rel(service, repository, "Использует")
+Rel(repository, devicedb, "Чтение/запись", "JDBC")
+
+@enduml 

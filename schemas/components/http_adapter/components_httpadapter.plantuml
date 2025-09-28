@@ -1,0 +1,26 @@
+@startuml components
+
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+System_Ext(device, "IoT-Устройство", "Устройство, которое может выполнять команды и/или измерять параметры окружающей среды")
+
+Container_Boundary(httpAdapter, "HTTPAdapter"){
+    Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
+    Component(controller, "RestController", "FastAPI", "API endpoint для получения информации с IoT-устройств")
+    Component(producer, "EventPublisher", "Kafka Producer", "Публикация телеметрии и статуса")
+    Component(handler, "EventHandler", "Kafka Consumer", "Обработка событий с командами")
+    Component(apiClient, "Client", "Python Requests", "Отправка команды на устройство")
+}
+
+Container_Ext(kafka, "Kafka", "Kafka", "Шина событий")
+
+Rel(device, controller, "Доставка телеметрии", "HTTP")
+Rel(controller, service, "Использует")
+Rel(producer, kafka, "Публикация телеметрии и статуса", "Producer")
+Rel(service, producer, "Использует")
+Rel(apiClient, device, "Доставка команд", "HTTP")
+Rel(kafka, handler, "Получение команд", "Consumer")
+Rel(handler, service, "Использует")
+Rel(service, apiClient, "Использует")
+
+@enduml 

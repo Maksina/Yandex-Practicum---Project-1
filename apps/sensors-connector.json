@@ -1,0 +1,17 @@
+{
+  "name": "sensors-connector",
+  "config": {
+    "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+    "tasks.max": "1",
+    "database.hostname": "postgres",
+    "database.port": "5432",
+    "database.user": "postgres",
+    "database.password": "postgres",
+    "database.dbname": "smarthome",
+    "database.server.name": "smarthome-db",
+    "topic.prefix": "smarthome-db",
+    "table.include.list": "public.sensors",
+    "slot.name": "debezium_sensors_slot",
+    "plugin.name": "pgoutput"
+  }
+}

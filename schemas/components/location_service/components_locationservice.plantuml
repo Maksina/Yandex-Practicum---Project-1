@@ -1,0 +1,20 @@
+@startuml components
+
+!include  https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Component.puml
+
+Container_Ext(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
+
+Container_Boundary(locationService, "LocationService"){
+    Component(controller, "RestController", "Spring REST Controller", "API endpoint для управления помещениями")
+    Component(service, "Service", "Бизнес-логика", "Обработка данных и реализация бизнес-логики")
+    Component(repository, "Repository", "Spring Data JPA", "Взаимодействия с БД")
+}
+
+ContainerDb_Ext(telemetrydb, "Telemetry DB", "InfluxDB", "Хранение телеметрии с IoT-устройств")
+
+Rel(apigw, controller, "Вызов API (Маршрутизация запросов пользователя)", "HTTP")
+Rel(controller, service, "Использует")
+Rel(service, repository, "Использует")
+Rel(repository, telemetrydb, "Чтение/запись", "HTTP / InfluxDB Line Protocol")
+
+@enduml 

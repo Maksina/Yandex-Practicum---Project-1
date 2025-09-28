@@ -1,0 +1,62 @@
+@startuml code
+
+title DeviceService C4(Code diagram)
+
+top to bottom direction
+
+class DeviceRepository {
+    +Device findByDeviceId()
+}
+
+class Device {
+    +Long id
+    +String name
+    +String deviceId
+    +String type
+    +Boolean status
+}
+
+class CommandProducer {
+    +KafkaTemplate<String, DeviceCommand> kafkaTemplate
+    +String topic
+    +void sendCommand()
+}
+
+class DeviceStatusConsumer {
+    +DeviceService deviceService
+    +String topic
+    +void consumeStatus()
+}
+
+
+class DeviceService {
+    +DeviceRepository repository
+    +CommandProducer commandProducer
+    +List<Device> getAllDevices()
+    +Device getDeviceById()
+    +Device createDevice()
+    +Device updateDevice()
+    +Device deleteDevice()
+    +void sendCommand()
+    +void updateDeviceOnlineStatus()
+}
+
+class DeviceController {
+    +DeviceService deviceService
+    +List<Device> getAllDevices()
+    +Device getDevice()
+    +Device createDevice()
+    +Device updateDevice()
+    +void deleteDevice()
+    +void sendCommand()
+
+}
+
+DeviceController ..> DeviceService : вызывает
+DeviceService ..> DeviceRepository : вызывает
+DeviceService ..> CommandProducer : вызывает
+DeviceStatusConsumer ..> DeviceService : вызывает
+DeviceService ..> Device : управляет
+DeviceRepository ..> Device : читает/изменяет
+
+@enduml
