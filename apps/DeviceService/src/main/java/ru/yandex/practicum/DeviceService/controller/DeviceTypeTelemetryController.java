@@ -22,26 +22,26 @@ public class DeviceTypeTelemetryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createTelemetry(dto));
     }
 
-    @GetMapping("/device-type-telemetries/{device_type_telemetry_id}")
-    public ResponseEntity<DeviceTypeTelemetry> getDeviceTypeTelemetry(@PathVariable Long device_type_telemetry_id) {
-        return ResponseEntity.ok(service.getTelemetryById(device_type_telemetry_id));
+    @GetMapping("/device-type-telemetries/{deviceTypeTelemetryId}")
+    public ResponseEntity<DeviceTypeTelemetry> getDeviceTypeTelemetry(@PathVariable Long deviceTypeTelemetryId) {
+        return ResponseEntity.ok(service.getTelemetryById(deviceTypeTelemetryId));
     }
 
-    @PatchMapping("/device-type-telemetries/{device_type_telemetry_id}")
+    @PatchMapping("/device-type-telemetries/{deviceTypeTelemetryId}")
     public ResponseEntity<DeviceTypeTelemetry> updateDeviceTypeTelemetry(
-            @PathVariable Long device_type_telemetry_id,
+            @PathVariable Long deviceTypeTelemetryId,
             @Valid @RequestBody DeviceTypeTelemetryUpdate dto) {
-        return ResponseEntity.ok(service.updateTelemetry(device_type_telemetry_id, dto));
+        return ResponseEntity.ok(service.updateTelemetry(deviceTypeTelemetryId, dto));
     }
 
-    @DeleteMapping("/device-type-telemetries/{device_type_telemetry_id}")
+    @DeleteMapping("/device-type-telemetries/{deviceTypeTelemetryId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteDeviceTypeTelemetry(@PathVariable Long device_type_telemetry_id) {
-        service.deleteTelemetry(device_type_telemetry_id);
+    public void deleteDeviceTypeTelemetry(@PathVariable Long deviceTypeTelemetryId) {
+        service.deleteTelemetry(deviceTypeTelemetryId);
     }
 
-    @GetMapping("/device-types/{device_type_id}/telemetries")
-    public ResponseEntity<List<DeviceTypeTelemetry>> getDeviceTypeTelemetriesByType(@PathVariable Long device_type_id) {
-        return ResponseEntity.ok(service.getTelemetriesByDeviceTypeId(device_type_id));
+    @GetMapping("/device-types/{deviceTypeId}/telemetries")
+    public ResponseEntity<List<DeviceTypeTelemetry>> getDeviceTypeTelemetriesByType(@PathVariable Long deviceTypeId) {
+        return ResponseEntity.ok(service.getTelemetriesByDeviceTypeId(deviceTypeId));
     }
 }

@@ -22,26 +22,26 @@ public class DeviceTypeCommandController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createCommand(dto));
     }
 
-    @GetMapping("/device-type-commands/{device_type_command_id}")
-    public ResponseEntity<DeviceTypeCommand> getDeviceTypeCommand(@PathVariable Long device_type_command_id) {
-        return ResponseEntity.ok(service.getCommandById(device_type_command_id));
+    @GetMapping("/device-type-commands/{deviceTypeCommandId}")
+    public ResponseEntity<DeviceTypeCommand> getDeviceTypeCommand(@PathVariable Long deviceTypeCommandId) {
+        return ResponseEntity.ok(service.getCommandById(deviceTypeCommandId));
     }
 
-    @PatchMapping("/device-type-commands/{device_type_command_id}")
+    @PatchMapping("/device-type-commands/{deviceTypeCommandId}")
     public ResponseEntity<DeviceTypeCommand> updateDeviceTypeCommand(
-            @PathVariable Long device_type_command_id,
+            @PathVariable Long deviceTypeCommandId,
             @Valid @RequestBody DeviceTypeCommandUpdate dto) {
-        return ResponseEntity.ok(service.updateCommand(device_type_command_id, dto));
+        return ResponseEntity.ok(service.updateCommand(deviceTypeCommandId, dto));
     }
 
-    @DeleteMapping("/device-type-commands/{device_type_command_id}")
+    @DeleteMapping("/device-type-commands/{deviceTypeCommandId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteDeviceTypeCommand(@PathVariable Long device_type_command_id) {
-        service.deleteCommand(device_type_command_id);
+    public void deleteDeviceTypeCommand(@PathVariable Long deviceTypeCommandId) {
+        service.deleteCommand(deviceTypeCommandId);
     }
 
-    @GetMapping("/device-types/{device_type_id}/commands")
-    public ResponseEntity<List<DeviceTypeCommand>> getDeviceTypeCommandsByType(@PathVariable Long device_type_id) {
-        return ResponseEntity.ok(service.getCommandsByDeviceTypeId(device_type_id));
+    @GetMapping("/device-types/{deviceTypeId}/commands")
+    public ResponseEntity<List<DeviceTypeCommand>> getDeviceTypeCommandsByType(@PathVariable Long deviceTypeId) {
+        return ResponseEntity.ok(service.getCommandsByDeviceTypeId(deviceTypeId));
     }
 }

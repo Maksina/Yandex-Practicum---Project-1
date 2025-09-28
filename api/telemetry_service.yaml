@@ -4,7 +4,7 @@ info:
   description: API для получения телеметрии устройств умного дома из InfluxDB.
   version: 1.0.0
 servers:
-  - url: https://localhost:8085/api/v1
+  - url: https://localhost:8091/api/v1
     description: Основной сервер TelemetryService
 
 tags:

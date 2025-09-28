@@ -49,3 +49,11 @@ CREATE TABLE IF NOT EXISTS device_type_telemetries (
 CREATE INDEX IF NOT EXISTS idx_devices_location_id ON devices(location_id);
 CREATE INDEX IF NOT EXISTS idx_commands_device_type_id ON device_type_commands(device_type_id);
 CREATE INDEX IF NOT EXISTS idx_telemetries_device_type_id ON device_type_telemetries(device_type_id);
+
+-- Предзаполнение таблицы типов устройств
+INSERT INTO device_types (name) VALUES
+  ('Temperature Sensor'),
+  ('Humidity Sensor'),
+  ('Smart Light'),
+  ('Motion Detector')
+ON CONFLICT DO NOTHING;

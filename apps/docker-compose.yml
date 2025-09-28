@@ -213,6 +213,24 @@ services:
     networks:
       - smarthome-network
 
+  sensor-sync-adapter:
+    build:
+      context: ./SensorSyncAdapter
+      dockerfile: Dockerfile
+    container_name: sensor-sync-adapter
+    depends_on:
+      kafka:
+        condition: service_started
+      connect:
+        condition: service_started
+      location-service:
+        condition: service_started
+      device-service:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - smarthome-network
+
 volumes:
   postgres_data:
   postgres_device_data: 

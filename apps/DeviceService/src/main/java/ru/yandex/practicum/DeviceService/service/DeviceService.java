@@ -34,9 +34,9 @@ public class DeviceService {
         if (deviceRepository.existsBySerialNumber(dto.getSerialNumber())) {
             throw new ConflictException("Device with serial number '" + dto.getSerialNumber() + "' already exists");
         }
-        if (!deviceTypeRepository.existsById(dto.getDeviceTypeId())) {
-            throw new DeviceTypeNotFoundException("Device type not found");
-        }
+//        if (!deviceTypeRepository.existsById(dto.getDeviceTypeId())) {
+//            throw new DeviceTypeNotFoundException("Device type not found");
+//        }
         DeviceEntity entity = new DeviceEntity();
         entity.setName(dto.getName());
         entity.setLocationId(dto.getLocationId());

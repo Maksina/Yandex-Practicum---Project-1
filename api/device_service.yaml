@@ -22,10 +22,10 @@ paths:
   /devices:
     get:
       tags: [Устройства]
-      summary: Получить список всех устройств для location_id
+      summary: Получить список всех устройств для locationId
       operationId: getDevices
       parameters:
-        - name: location_id
+        - name: locationId
           in: query
           required: true
           schema:
@@ -64,17 +64,17 @@ paths:
         '400':
           description: Некорректные данные
         '409':
-          description: Устройство с таким serial_number уже существует
+          description: Устройство с таким serialNumber уже существует
         '500':
           description: Внутренняя ошибка сервера
 
-  /devices/{device_id}:
+  /devices/{deviceId}:
     get:
       tags: [Устройства]
       summary: Получить устройство по ID
       operationId: getDeviceById
       parameters:
-        - name: device_id
+        - name: deviceId
           in: path
           required: true
           schema:
@@ -95,10 +95,10 @@ paths:
     patch:
       tags: [Устройства]
       summary: Обновить устройство
-      description: Поддерживается обновление name и location_id.
+      description: Поддерживается обновление name и locationId.
       operationId: updateDeviceName
       parameters:
-        - name: device_id
+        - name: deviceId
           in: path
           required: true
           schema:
@@ -129,7 +129,7 @@ paths:
       summary: Удалить устройство по ID
       operationId: deleteDevice
       parameters:
-        - name: device_id
+        - name: deviceId
           in: path
           required: true
           schema:
@@ -143,13 +143,13 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
 
-  /devices/{device_id}/commands:
+  /devices/{deviceId}/commands:
     post:
       tags: [Устройства]
       summary: Отправить команду устройству
       operationId: sendCommandToDevice
       parameters:
-        - name: device_id
+        - name: deviceId
           in: path
           required: true
           schema:
@@ -213,13 +213,13 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
 
-  /device-types/{device_type_id}:
+  /device-types/{deviceTypeId}:
     get:
       tags: [Типы устройств]
       summary: Получить тип устройства по ID
       operationId: getDeviceTypeById
       parameters:
-        - name: device_type_id
+        - name: deviceTypeId
           in: path
           required: true
           schema:
@@ -242,7 +242,7 @@ paths:
       summary: Обновить название типа устройства
       operationId: updateDeviceTypeName
       parameters:
-        - name: device_type_id
+        - name: deviceTypeId
           in: path
           required: true
           schema:
@@ -273,7 +273,7 @@ paths:
       summary: Удалить тип устройства по ID
       operationId: deleteDeviceType
       parameters:
-        - name: device_type_id
+        - name: deviceTypeId
           in: path
           required: true
           schema:
@@ -317,13 +317,13 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
 
-  /device-type-commands/{device_type_command_id}:
+  /device-type-commands/{deviceTypeCommandId}:
     get:
       tags: [Команды типов устройств]
       summary: Получить конкретную команду по ID
       operationId: getDeviceTypeCommand
       parameters:
-        - name: device_type_command_id
+        - name: deviceTypeCommandId
           in: path
           required: true
           schema:
@@ -346,7 +346,7 @@ paths:
       summary: Обновить команду по ID
       operationId: updateDeviceTypeCommand
       parameters:
-        - name: device_type_command_id
+        - name: deviceTypeCommandId
           in: path
           required: true
           schema:
@@ -379,7 +379,7 @@ paths:
       summary: Удалить команду по ID
       operationId: deleteDeviceTypeCommand
       parameters:
-        - name: device_type_command_id
+        - name: deviceTypeCommandId
           in: path
           required: true
           schema:
@@ -393,13 +393,13 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
 
-  /device-types/{device_type_id}/commands:
+  /device-types/{deviceTypeId}/commands:
     get:
       tags: [Команды типов устройств]
       summary: Получить список команд для типа устройства
       operationId: getDeviceTypeCommandsByType
       parameters:
-        - name: device_type_id
+        - name: deviceTypeId
           in: path
           required: true
           schema:
@@ -447,13 +447,13 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
 
-  /device-type-telemetries/{device_type_telemetry_id}:
+  /device-type-telemetries/{deviceTypeTelemetryId}:
     get:
       tags: [Телеметрия типов устройств]
       summary: Получить телеметрию по ID
       operationId: getDeviceTypeTelemetry
       parameters:
-        - name: device_type_telemetry_id
+        - name: deviceTypeTelemetryId
           in: path
           required: true
           schema:
@@ -476,7 +476,7 @@ paths:
       summary: Обновить телеметрию по ID
       operationId: updateDeviceTypeTelemetry
       parameters:
-        - name: device_type_telemetry_id
+        - name: deviceTypeTelemetryId
           in: path
           required: true
           schema:
@@ -509,7 +509,7 @@ paths:
       summary: Удалить телеметрию по ID
       operationId: deleteDeviceTypeTelemetry
       parameters:
-        - name: device_type_telemetry_id
+        - name: deviceTypeTelemetryId
           in: path
           required: true
           schema:
@@ -523,13 +523,13 @@ paths:
         '500':
           description: Внутренняя ошибка сервера
 
-  /device-types/{device_type_id}/telemetries:
+  /device-types/{deviceTypeId}/telemetries:
     get:
       tags: [Телеметрия типов устройств]
       summary: Получить список телеметрии для типа устройства
       operationId: getDeviceTypeTelemetriesByType
       parameters:
-        - name: device_type_id
+        - name: deviceTypeId
           in: path
           required: true
           schema:
@@ -554,41 +554,41 @@ components:
     Device:
       type: object
       required:
-        - device_id
+        - deviceId
         - name
-        - location_id
-        - device_type_id
-        - is_active
-        - serial_number
-        - created_at
-        - updated_at
+        - locationId
+        - deviceTypeId
+        - isActive
+        - serialNumber
+        - createdAt
+        - updatedAt
       properties:
-        device_id:
+        deviceId:
           type: integer
           format: int64
           readOnly: true
         name:
           type: string
           example: "Гостиная лампа"
-        location_id:
+        locationId:
           type: integer
           format: int64
           example: 1
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           example: 3
-        is_active:
+        isActive:
           type: boolean
           example: true
-        serial_number:
+        serialNumber:
           type: string
           example: "SN-123456789"
-        created_at:
+        createdAt:
           type: string
           format: date-time
           readOnly: true
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           readOnly: true
@@ -597,22 +597,22 @@ components:
       type: object
       required:
         - name
-        - location_id
-        - device_type_id
-        - serial_number
+        - locationId
+        - deviceTypeId
+        - serialNumber
       properties:
         name:
           type: string
           example: "Кухонный датчик движения"
-        location_id:
+        locationId:
           type: integer
           format: int64
           example: 2
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           example: 5
-        serial_number:
+        serialNumber:
           type: string
           example: "SN-987654321"
 
@@ -628,32 +628,32 @@ components:
     DeviceCommand:
       type: object
       required:
-        - command_name
+        - commandName
       properties:
-        command_name:
+        commandName:
           type: string
           example: "turn_on"
 
     DeviceType:
       type: object
       required:
-        - device_type_id
+        - deviceTypeId
         - name
-        - created_at
-        - updated_at
+        - createdAt
+        - updatedAt
       properties:
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           readOnly: true
         name:
           type: string
           example: "Умная лампа"
-        created_at:
+        createdAt:
           type: string
           format: date-time
           readOnly: true
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           readOnly: true
@@ -694,28 +694,28 @@ components:
     DeviceTypeCommand:
       type: object
       required:
-        - device_type_command_id
-        - device_type_id
+        - deviceTypeCommandId
+        - deviceTypeId
         - name
-        - created_at
-        - updated_at
+        - createdAt
+        - updatedAt
       properties:
-        device_type_command_id:
+        deviceTypeCommandId:
           type: integer
           format: int64
           readOnly: true
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           readOnly: true
         name:
           type: string
           example: "turn_on"
-        created_at:
+        createdAt:
           type: string
           format: date-time
           readOnly: true
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           readOnly: true
@@ -723,10 +723,10 @@ components:
     DeviceTypeCommandCreate:
       type: object
       required:
-        - device_type_id
+        - deviceTypeId
         - name
       properties:
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           example: 3
@@ -746,18 +746,18 @@ components:
     DeviceTypeTelemetry:
       type: object
       required:
-        - device_type_telemetry_id
-        - device_type_id
+        - deviceTypeTelemetryId
+        - deviceTypeId
         - telemetry_type
         - name
-        - created_at
-        - updated_at
+        - createdAt
+        - updatedAt
       properties:
-        device_type_telemetry_id:
+        deviceTypeTelemetryId:
           type: integer
           format: int64
           readOnly: true
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           readOnly: true
@@ -767,11 +767,11 @@ components:
         name:
           type: string
           example: "Температура"
-        created_at:
+        createdAt:
           type: string
           format: date-time
           readOnly: true
-        updated_at:
+        updatedAt:
           type: string
           format: date-time
           readOnly: true
@@ -779,11 +779,11 @@ components:
     DeviceTypeTelemetryCreate:
       type: object
       required:
-        - device_type_id
+        - deviceTypeId
         - name
         - telemetry_type
       properties:
-        device_type_id:
+        deviceTypeId:
           type: integer
           format: int64
           example: 3

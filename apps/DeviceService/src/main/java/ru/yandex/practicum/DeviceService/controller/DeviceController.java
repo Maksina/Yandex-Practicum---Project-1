@@ -18,8 +18,8 @@ public class DeviceController {
     private final DeviceService deviceService;
 
     @GetMapping
-    public ResponseEntity<List<Device>> getDevices(@RequestParam Long location_id) {
-        return ResponseEntity.ok(deviceService.getDevicesByLocation(location_id));
+    public ResponseEntity<List<Device>> getDevices(@RequestParam Long locationId) {
+        return ResponseEntity.ok(deviceService.getDevicesByLocation(locationId));
     }
 
     @PostMapping

@@ -4,7 +4,7 @@ info:
   description: API для управления иерархической структурой помещений (дом, комната и т.д.).
   version: 1.0.0
 servers:
-  - url: https://localhost:8086/api/v1
+  - url: https://localhost:8092/api/v1
     description: Основной сервер LocationService
 
 tags:

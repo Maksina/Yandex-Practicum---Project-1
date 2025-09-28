@@ -28,21 +28,21 @@ public class DeviceTypeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(deviceTypeService.createDeviceType(dto));
     }
 
-    @GetMapping("/{device_type_id}")
-    public ResponseEntity<DeviceTypeWithDetails> getDeviceTypeById(@PathVariable("device_type_id") Long id) {
+    @GetMapping("/{deviceTypeId}")
+    public ResponseEntity<DeviceTypeWithDetails> getDeviceTypeById(@PathVariable("deviceTypeId") Long id) {
         return ResponseEntity.ok(deviceTypeService.getDeviceTypeWithDetails(id));
     }
 
-    @PatchMapping("/{device_type_id}")
+    @PatchMapping("/{deviceTypeId}")
     public ResponseEntity<DeviceType> updateDeviceTypeName(
-            @PathVariable("device_type_id") Long id,
+            @PathVariable("deviceTypeId") Long id,
             @Valid @RequestBody DeviceTypeNameUpdate dto) {
         return ResponseEntity.ok(deviceTypeService.updateDeviceTypeName(id, dto));
     }
 
-    @DeleteMapping("/{device_type_id}")
+    @DeleteMapping("/{deviceTypeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteDeviceType(@PathVariable("device_type_id") Long id) {
+    public void deleteDeviceType(@PathVariable("deviceTypeId") Long id) {
         deviceTypeService.deleteDeviceType(id);
     }
 }
