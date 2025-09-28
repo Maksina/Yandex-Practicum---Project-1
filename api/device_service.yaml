@@ -4,7 +4,7 @@ info:
   description: API для управления IoT-устройствами, типами устройств, командами и телеметрией.
   version: 1.0.0
 servers:
-  - url: https://localhost:8083/api/v1
+  - url: https://localhost:8090/api/v1
     description: Основной сервер DeviceService
 
 tags:

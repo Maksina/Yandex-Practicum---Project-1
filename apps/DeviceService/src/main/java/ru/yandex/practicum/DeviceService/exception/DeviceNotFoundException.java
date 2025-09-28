@@ -1,4 +1,7 @@
 package ru.yandex.practicum.DeviceService.exception;
 
-public class DeviceNotFoundException {
+public class DeviceNotFoundException extends RuntimeException {
+    public DeviceNotFoundException(String message) {
+        super(message);
+    }
 }

@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Table(name = "device_type_telemetries",
         uniqueConstraints = @UniqueConstraint(columnNames = {"device_type_id", "name"}))
 @Data
-public class DeviceTypeTelemetry {
+public class DeviceTypeTelemetryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long deviceTypeTelemetryId;

@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "devices", uniqueConstraints = @UniqueConstraint(columnNames = "serial_number"))
 @Data
-public class Device {
+public class DeviceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long deviceId;
