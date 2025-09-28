@@ -1,0 +1,109 @@
+@startuml containers
+
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+AddElementTag("migration", $fontColor="Yellow")
+
+Person(client, "Пользователь", "Клиент компании, установивший IoT-устройства, интегрированные с нашей системой")
+Person(specialist, "Специалист", "Сотрудник компании, который администрирует подключение и вывод IoT-устройств")
+
+System_Boundary(warmhouse, "Тёплый дом"){
+
+  System_Boundary(monolith, "Тёплый дом (монолитное приложение)"){
+    Container(SmartHomeMonolith, "SmartHome", "Go", "Монолитное приложение", $tags="migration")     
+    ContainerDb(SmartHomeMonolithDB, "SmartHomeDB", "PostgreSQL", "Хранение информации о датчиках, помещениях и телеметрии", $tags="migration")    
+  }
+
+  Container(debezium, "CDC", "Debezium", $tags="migration")    
+
+  Container(ui, "Веб-интерфейс", "VueJS", "Веб-интерфейс для управления и мониторинга")
+  Container(apigw, "API Gateway", "Spring Gateway", "Маршрутизация запросов и аутетификация")
+  Container(keycloak, "Keycloak", "OpenID", "Аутентификация и авторизация")
+  Container(userservice, "User Service", "Java Spring", "Управление информацией о клиенте")
+  Container(locationservice, "Location Service", "Java Spring", "Управление помещениями и привязка датчиков")
+  Container(deviceservice, "Device Service", "Java Spring", "Управление IoT-устройства")
+  Container(telemetryservice, "Telemetry Service", "Java Spring", "Управление телеметрией с устройств")
+  Container(automationservice, "Automation Service", "Java Spring", "Управление автоматизациями IoT-устройств")
+  Container(SensorSyncAdapter, "SensorSyncAdapter", "Python 3", "Преобразование данных монолита и передача их в микросервисы", $tags="migration")    
+
+  ContainerDb(Locationdb, "Location  DB", "PostgreSQL", "Хранение информации о помещении")
+  ContainerDb(devicedb, "Device DB", "PostgreSQL", "Хранение информации об IoT-устройствах")
+  ContainerDb(telemetrydb, "Telemetry DB", "InfluxDB", "Хранение телеметрии с IoT-устройств")
+  ContainerDb(userdb, "User DB", "PostgreSQL", "Хранение данных пользователя")
+  ContainerDb(automationdb, "Automation DB", "PostgreSQL", "Хранение информации об автоматизациях и сценариях работы")
+  
+  Container(kafka, "Kafka", "Kafka", "Шина событий", $tags="migration")    
+  
+  Container_Boundary(iotgw, "IoT Gateway"){
+    Container(httpadapter, "HTTPAdapter", "Python", "Получение по HTTP и преобразование данных с датчиков в единый формат")
+    Container(mqttadapter, "MQTTAdapter", "Python", "Получение по MQTT и преобразование данных с датчиков в единый формат")
+  }
+
+}
+
+System_Ext(device, "IoT-Устройство", "Устройство, которое может выполнять команды и/или измерять параметры окружающей среды")
+
+Rel(client, ui, "Просмотр данных с датчиков и удаленное управление устройствами", "HTTP")
+Rel(specialist, ui, "Администрирование устройств и датчиков в системе (добавление, удаление)", "HTTP")
+Rel(ui, apigw, "Вызов REST API", "HTTP")
+Rel(ui, keycloak, "Авторизация и аутентификация", "HTTP")
+Rel(apigw, keycloak, "Проверка токена", "HTTP")
+Rel(apigw, userservice, "Маршрутизация", "HTTP")
+Rel(apigw, locationservice, "Маршрутизация", "HTTP")
+Rel(apigw, deviceservice, "Маршрутизация", "HTTP")
+Rel(apigw, telemetryservice, "Маршрутизация", "HTTP")
+Rel(apigw, automationservice, "Маршрутизация", "HTTP")
+Rel(SensorSyncAdapter, deviceservice, "Управление устройствами", "HTTP")
+Rel(SensorSyncAdapter, locationservice, "Управление помещением", "HTTP")
+Rel(debezium, SmartHomeMonolithDB, "Репликация данных")
+Rel(debezium, kafka, "Публикация изменений БД", "Consumer")
+
+Rel(SmartHomeMonolith, SmartHomeMonolithDB, "Чтение/запись", "JDBC")
+Rel(userservice, userdb, "Чтение/запись", "JDBC")
+Rel(locationservice, Locationdb, "Чтение/запись", "JDBC")
+Rel(deviceservice, devicedb, "Чтение/запись", "JDBC")
+Rel(telemetryservice, telemetrydb, "Чтение/запись", "HTTP / InfluxDB Line Protocol")
+Rel(automationservice, automationdb, "Чтение/запись", "JDBC")
+
+Rel(automationservice, deviceservice, "Отправка команды на устройство", "HTTP")
+
+Rel(deviceservice, kafka, "Публикация команд", "Producer")
+
+Rel(kafka, deviceservice, "Доставка статуса", "Consumer")
+Rel(kafka, telemetryservice, "Доставка телеметрии", "Consumer")
+Rel(kafka, automationservice, "Доставка телеметрии", "Consumer")
+Rel(kafka, httpadapter, "Доставка команды", "Consumer")
+Rel(kafka, mqttadapter, "Доставка команды", "Consumer")
+Rel(kafka, SensorSyncAdapter, "Доставка изменений в БД Монолита", "Consumer")
+
+Rel(httpadapter, kafka, "Публикация телеметрии и статуса", "Producer")
+Rel(mqttadapter, kafka, "Публикация телеметрии и статуса", "Producer")
+
+Rel(device, httpadapter, "Доставка телеметрии", "HTTP")
+Rel(device, mqttadapter, "Доставка телеметрии", "MQTT")
+
+Rel(httpadapter, device, "Доставка команд", "HTTP")
+Rel(mqttadapter, device, "Доставка команд", "MQTT")
+
+Lay_R(userservice, locationservice)
+Lay_R(locationservice, deviceservice)
+Lay_R(deviceservice, telemetryservice)
+Lay_R(telemetryservice, automationservice)
+Lay_R(ui, keycloak)
+Lay_R(apigw, keycloak)
+
+Lay_D(userservice, userdb)
+Lay_D(locationservice, Locationdb)
+Lay_D(deviceservice, devicedb)
+Lay_D(telemetryservice, telemetrydb)
+Lay_D(automationservice, automationdb)
+
+Lay_D(userservice, kafka)
+Lay_D(locationservice, kafka)
+Lay_D(deviceservice, kafka)
+Lay_D(telemetryservice, kafka)
+Lay_D(automationservice, kafka)
+Lay_D(kafka, iotgw)
+Lay_D(SmartHomeMonolithDB, debezium)
+
+@enduml
