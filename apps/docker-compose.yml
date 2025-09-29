@@ -133,6 +133,8 @@ services:
       context: ./DeviceTempApi
       dockerfile: Dockerfile
     container_name: temperature-api
+    environment:
+      SERVER_PORT: 8081
     ports:
       - "8081:8081"
     networks:
@@ -166,6 +168,7 @@ services:
       postgres-device:
         condition: service_healthy
     environment:
+      SERVER_PORT: 8090
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-device:5432/device_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
@@ -184,6 +187,7 @@ services:
       postgres-location:
         condition: service_healthy
     environment:
+      SERVER_PORT: 8092
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-location:5432/location_db
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
