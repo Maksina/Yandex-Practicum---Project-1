@@ -1,5 +1,22 @@
-FROM openjdk:17-jdk-slim
+#1: сборка
+FROM maven:3.9-eclipse-temurin-17 AS builder
+
 WORKDIR /app
-COPY target/TelemetryService-0.0.1-SNAPSHOT.jar app.jar
-EXPOSE 8091
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
+
+#2: образ
+FROM openjdk:17-jdk-slim
+
+WORKDIR /app
+
+COPY --from=builder /app/target/*.jar app.jar
+
+# Порт по умолчанию — можно переопределить через переменную окружения
+ENV SERVER_PORT=8091
+EXPOSE $SERVER_PORT
+
+# Запуск с поддержкой динамического порта через переменную
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=$SERVER_PORT -jar app.jar"]
